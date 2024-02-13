@@ -1,0 +1,4 @@
+Changelog for Workload.
+1.0.0-beta
+==============
+- init.
