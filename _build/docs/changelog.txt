@@ -3,3 +3,4 @@ Changelog for Workload.
 ==============
 - init.
 - В работу.
+- bgColorSmena.

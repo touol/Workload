@@ -45,6 +45,7 @@
                 :style="{backgroundColor: bgColorSmena(smena).color}"
                 :class="{ weekend: isWeekend(smena.date) }">
                 {{ formatDate(smena.date) }} №{{ smena.number }}
+                {{ bgColorSmena(smena).proc }}%
               </th>
             </thead>
             <tbody>
@@ -57,7 +58,7 @@
                   @dragenter.prevent
                   @dragover.prevent
                   >
-                  <span>{{ bgColorSmenaNaryad(smena,tSkladNaryad).proc }}
+                  <span>{{ bgColorSmenaNaryad(smena,tSkladNaryad).proc }}%
                     ({{ bgColorSmenaNaryad(smena,tSkladNaryad).sum_teor_time }}/{{ bgColorSmenaNaryad(smena,tSkladNaryad).sum_reserve_time }})</span>
                   <div>
                       <a v-for="table of Data.gtsBTable.filter(x=>x.smena_id === smena.id && x.department_id === tSkladNaryad.department_id)"
@@ -608,12 +609,14 @@
       sum_teor_time:0,
       proc:0,
     }
-    Data.value.gtsBTableList.filter(x=>x.smena_id === smena.id)
+    Data.value.gtsBTableList.filter(x=>x.smena_id == smena.id)
     .forEach((table) => {
-      row.sum_reserve_time += parseFloat(table.reserve_time)
-      row.sum_teor_time += parseFloat(table.teor_time)
+      // console.log('table.teor_time',table.teor_time)
+      if(table.reserve_time) row.sum_reserve_time += parseFloat(table.reserve_time)
+      if(table.teor_time) row.sum_teor_time += parseFloat(table.teor_time)
     })
     if(row.sum_reserve_time > 0) row.proc = Math.ceil(row.sum_teor_time/row.sum_reserve_time*100)
+
     row.color = getColor(row.proc)
     return row
   }
