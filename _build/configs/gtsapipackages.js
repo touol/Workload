@@ -11,7 +11,9 @@ export default {
                 active:true,
                 properties: {
                     actions:{
-                        read:{}
+                        read:{
+                            test:1
+                        }
                     }
                 }
             },
@@ -56,7 +58,10 @@ export default {
                 active:true,
                 properties: {
                     actions:{
-                        read:{}
+                        read:{},
+                        update:{
+                            groups:'ceh_boss',
+                        },
                     },
                     queryes:{
                         cehStaff:{
