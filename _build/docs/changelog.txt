@@ -4,3 +4,4 @@ Changelog for Workload.
 - init.
 - В работу.
 - bgColorSmena.
+- Табличку внутри ячеек.

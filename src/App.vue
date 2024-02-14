@@ -7,6 +7,7 @@
         <Button label="Применить"  
           class="p-button-success p-mr-2" 
           @click="loadData" />
+        <label>Показывать в таблице</label><InputSwitch v-model="ShowInTable" />
       </template>
     </Toolbar>
     <Splitter  class="mb-5">
@@ -69,18 +70,39 @@
 
                     </a>
                   </div>
-                  <ul class="staff-menu">
-                    <li v-for="tablelist of Data.gtsBTableList.filter(x=>x.smena_id === smena.id && x.department_id === tSkladNaryad.department_id)" >
-                      <a v-for="staff of Staffs.filter(x=>x.id === tablelist.staff_id)"
-                        @dragstart="onDragStartMove($event,staff,tablelist,'moveStaff')"
-                        draggable="true"
-                        @click="editTableList(tablelist)"
-                        >
-                        {{ staff.fio }} {{ tablelist.reserve_time }} {{ tablelist.teor_time }} {{ tablelist.teor_ktu }}
+                  <template v-if="ShowInTable && bgColorSmenaNaryad(smena,tSkladNaryad).sum_reserve_time > 0">
+                    <table>
+                      <tr><td>ФИО</td><td>Ресурс</td><td>Время</td><td>КТУ</td></tr>
+                      <tr v-for="tablelist of Data.gtsBTableList.filter(x=>x.smena_id === smena.id && x.department_id === tSkladNaryad.department_id)">
+                        <td>
+                          <a v-for="staff of Staffs.filter(x=>x.id === tablelist.staff_id)"
+                            @dragstart="onDragStartMove($event,staff,tablelist,'moveStaff')"
+                            draggable="true"
+                            @click="editTableList(tablelist)"
+                            >
+                            {{ staff.fio }}
+                          </a>
+                        </td>
+                        <td>{{ tablelist.reserve_time }}</td>
+                        <td>{{ tablelist.teor_time }}</td>
+                        <td>{{ tablelist.teor_ktu }}</td>
+                      </tr>
+                    </table>
+                  </template>
+                  <template v-else>
+                    <ul class="staff-menu">
+                      <li v-for="tablelist of Data.gtsBTableList.filter(x=>x.smena_id === smena.id && x.department_id === tSkladNaryad.department_id)" >
+                        <a v-for="staff of Staffs.filter(x=>x.id === tablelist.staff_id)"
+                          @dragstart="onDragStartMove($event,staff,tablelist,'moveStaff')"
+                          draggable="true"
+                          @click="editTableList(tablelist)"
+                          >
+                          {{ staff.fio }} {{ tablelist.reserve_time }}/{{ tablelist.teor_time }}/{{ tablelist.teor_ktu }}
 
-                      </a>
-                    </li>
-                  </ul>
+                        </a>
+                      </li>
+                    </ul>
+                  </template>
                 </td>
               
               </tr>
@@ -146,6 +168,7 @@
   import Calendar from 'primevue/calendar';
   import Dialog from 'primevue/dialog';
   import InputText from 'primevue/inputtext'
+  import InputSwitch from 'primevue/inputswitch';
 
   const toast = useToast();
   const date = ref(new Date());
@@ -162,6 +185,7 @@
     })
     loadData()
   });
+  const ShowInTable = ref(true);
   const dt = ref();
   const Data = ref({});
   const Staffs = ref([]);
@@ -752,6 +776,8 @@
   .workload-table td,.workload-table th{
     padding: 8px;
     border: 1px solid #555;
+    vertical-align: top;
+    color:black;
   }
   .workload-table{
     border: 1px solid #ddd;
