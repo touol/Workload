@@ -41,7 +41,7 @@
         <div class="card" style="overflow-x: scroll;">
           <table class="p-datatable-table workload-table">
             <thead>
-              <th></th>
+              <th class="naryad"></th>
               <th v-for="smena of Data.tSkladSmena" @click="sCurrentSmena(smena.id)"  
                 :style="{backgroundColor: bgColorSmena(smena).color}"
                 :class="{ weekend: isWeekend(smena.date) }">
@@ -51,7 +51,7 @@
             </thead>
             <tbody>
               <tr v-for="tSkladNaryad of Data.tSkladNaryad.filter(x=>x.shown == 1)">
-                <td>{{ tSkladNaryad.name }}</td>
+                <td class="naryad">{{ tSkladNaryad.name }}</td>
                 <td v-for="smena of Data.tSkladSmena" 
                   :style="{backgroundColor: bgColorSmenaNaryad(smena,tSkladNaryad).color}"
                   :class="{ weekend: isWeekend(smena.date) }"
@@ -799,5 +799,15 @@
   }
   .workload-table .weekend{
     border: 3px solid red;
+  }
+  .workload-table th {
+    position: sticky;
+    top: 0;
+    background: white;
+  }
+  .workload-table .naryad {
+    position: sticky;
+    left: 0;
+    background: white;
   }
 </style>

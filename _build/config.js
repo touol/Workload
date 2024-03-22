@@ -1,7 +1,7 @@
 export default {
     name:"Workload",
     name_lower:"workload",
-    version:"1.0.3", 
+    version:"1.0.4", 
     release:"beta",
     schema:true,
     update:{

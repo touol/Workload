@@ -5,3 +5,4 @@ Changelog for Workload.
 - В работу.
 - bgColorSmena.
 - Табличку внутри ячеек.
+- Прилипание столбца нарядов.
