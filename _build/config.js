@@ -3,7 +3,7 @@ export default {
     name_lower:"workload",
     version:"1.0.5", 
     release:"beta",
-    schema:true,
+    schema:false,
     update:{
         snippets: true,
         settings: true,
