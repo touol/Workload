@@ -6,3 +6,4 @@ Changelog for Workload.
 - bgColorSmena.
 - Табличку внутри ячеек.
 - Прилипание столбца нарядов.
+- Прилипание и koef_time.

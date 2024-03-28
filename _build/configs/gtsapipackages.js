@@ -30,6 +30,22 @@ export default {
                     }
                 }
             },
+            {
+                class:'tSkladNaryadSmena',
+                tree: false,
+                authenticated:true,
+                groups:'',
+                permitions:'',
+                active:true,
+                properties: {
+                    actions:{
+                        read:{},
+                        update:{
+                            groups:'ceh_boss,Administrator',
+                        },
+                    }
+                }
+            },
         ]
     },
     gtsbalance:{

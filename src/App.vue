@@ -10,8 +10,8 @@
         <label>Показывать в таблице</label><InputSwitch v-model="ShowInTable" />
       </template>
     </Toolbar>
-    <Splitter  class="mb-5">
-      <SplitterPanel class="flex flex-column" :size="10">
+    <div class="outer">
+      <div class="part smena">
         <h3>Смена</h3>
         <a v-if="Data.tSkladSmena.filter(x=>x.id == currentSmena).length == 1">
           {{ formatDate(Data.tSkladSmena.filter(x=>x.id == currentSmena)[0].date) }} 
@@ -21,24 +21,30 @@
           Для выбора смены шелкните по заголовку столбца таблицы
         </a>
         <h3>Не распределенные</h3>
-        <a v-for="staff of Staffs.filter(x=>!Data.gtsBTableList.some(item => item.staff_id === x.id && item.smena_id === currentSmena))"
-          @dragstart="onDragStart($event,staff,'copyStaff')"
-          draggable="true"
-          @click="editStaff(staff)"
-          >
-          {{ staff.fio }} {{ staff.teor_ktu }}
-        </a>
+        <ul>
+          <li v-for="staff of Staffs.filter(x=>!Data.gtsBTableList.some(item => item.staff_id === x.id && item.smena_id === currentSmena))"
+            >
+            <a
+            @dragstart="onDragStart($event,staff,'copyStaff')"
+            draggable="true"
+            @click="editStaff(staff)"
+            >{{ staff.fio }} {{ staff.teor_ktu }}</a>
+          </li>
+        </ul>
         <h3>Распределенные</h3>
-        <a v-for="staff of Staffs.filter(x=>Data.gtsBTableList.some(item => item.staff_id === x.id && item.smena_id === currentSmena))"
-          @dragstart="onDragStart($event,staff,'copyStaff')"
-          draggable="true"
-          @click="editStaff(staff)"
-          >
-          {{ staff.fio }} {{ staff.teor_ktu }}
-        </a>
-      </SplitterPanel>
-      <SplitterPanel class="flex flex-column" :size="90">
-        <div class="card" style="overflow-x: scroll;">
+        <ul>
+          <li v-for="staff of Staffs.filter(x=>Data.gtsBTableList.some(item => item.staff_id === x.id && item.smena_id === currentSmena))"
+            >
+            <a
+            @dragstart="onDragStart($event,staff,'copyStaff')"
+            draggable="true"
+            @click="editStaff(staff)"
+            >{{ staff.fio }} {{ staff.teor_ktu }}</a>
+          </li>
+        </ul>
+      </div>
+      <div class="part smens-table">
+        <div class="card">
           <table class="p-datatable-table workload-table">
             <thead>
               <th class="naryad"></th>
@@ -110,9 +116,8 @@
           </table>
           
         </div>
-        
-      </SplitterPanel>
-    </Splitter>
+      </div>
+    </div>
     <Toast />
     <Dialog v-model:visible="tableListDialog" 
       :style="{width: '450px'}" 
@@ -197,6 +202,7 @@
   Data.value['gtsBTable'] = [];
   Data.value['tSkladNaryad'] = [];
   Data.value['tSkladSmena'] = [];
+  Data.value['tSkladNaryadSmena'] = [];
   let smena_ids = []
 
   //edit staff item
@@ -633,11 +639,22 @@
       sum_teor_time:0,
       proc:0,
     }
+    let koef_time
+    let teor_time
+    let naryad_id = 0
     Data.value.gtsBTableList.filter(x=>x.smena_id == smena.id)
     .forEach((table) => {
       // console.log('table.teor_time',table.teor_time)
-      if(table.reserve_time) row.sum_reserve_time += parseFloat(table.reserve_time)
-      if(table.teor_time) row.sum_teor_time += parseFloat(table.teor_time)
+      teor_time = table.teor_time
+      if(Data.value.tSkladNaryad.length > 0){
+        naryad_id = Data.value.tSkladNaryad.filter(x=>table.department_id === x.department_id)[0].id
+      }
+      if(Data.value.tSkladNaryadSmena.length > 0 && naryad_id > 0){
+        koef_time = Data.value.tSkladNaryadSmena.filter(x=>x.smena_id === smena.id && naryad_id === x.naryad_id)[0].koef_time
+        teor_time = teor_time*koef_time
+      }
+      if(table.reserve_time) row.sum_reserve_time += parseFloat(table.reserve_time*table.teor_ktu)
+      if(table.teor_time) row.sum_teor_time += parseFloat(teor_time)
     })
     if(row.sum_reserve_time > 0) row.proc = Math.ceil(row.sum_teor_time/row.sum_reserve_time*100)
 
@@ -652,9 +669,14 @@
     }
     Data.value.gtsBTableList.filter(x=>x.smena_id === smena.id && tSkladNaryad.department_id === x.department_id)
     .forEach((table) => {
-      if(table.reserve_time) row.sum_reserve_time += parseFloat(table.reserve_time)
+      if(table.reserve_time) row.sum_reserve_time += parseFloat(table.reserve_time*table.teor_ktu)
       if(table.teor_time) row.sum_teor_time += parseFloat(table.teor_time)
     })
+    let koef_time
+    if(Data.value.tSkladNaryadSmena.length > 0){
+      koef_time = Data.value.tSkladNaryadSmena.filter(x=>x.smena_id === smena.id && tSkladNaryad.id === x.naryad_id)[0].koef_time
+      row.sum_teor_time = row.sum_teor_time*koef_time
+    }
     if(row.sum_reserve_time > 0) row.proc = Math.ceil(row.sum_teor_time/row.sum_reserve_time*100)
     row.color = getColor(row.proc)
     return row
@@ -723,6 +745,17 @@
           sortField:'id',
           sortOrder:1
         })
+        getTable('tSkladNaryadSmena',{
+          filters:{
+            smena_id:{
+              class:'tSkladNaryadSmena',
+              value:smena_ids,
+              matchMode:'in'
+            },
+          },
+          sortField:'id',
+          sortOrder:0
+        })
       }
     }
     loading_tSkladSmena.value = false
@@ -741,7 +774,9 @@
       sortOrder:1,
       limit:20
     })
+    
   };
+ 
   const currentSmena = ref(0)
   const sCurrentSmena = (smena_id) => {
     currentSmena.value = smena_id
@@ -807,7 +842,26 @@
   }
   .workload-table .naryad {
     position: sticky;
-    left: 0;
+    left: 200px;
     background: white;
+  }
+  .part{
+    display:inline-block;
+    vertical-align:top;
+  }
+  .outer{
+    position: relative;
+    width: 8000px;
+    display: block;
+  }
+  .smena{
+    width: 200px;
+    position: sticky;
+    left: 0;
+    top:0;
+    background: white;
+    overflow-y: scroll;
+    height: 95vh;
+    z-index: 10;
   }
 </style>

@@ -37,6 +37,10 @@ form.append('settings', JSON.stringify(settings))
 form.append('gtsapirules', JSON.stringify(gtsapirules))
 form.append('gtsapipackages', JSON.stringify(gtsapipackages))
 
+const fileExists = async path => !!(await fs.stat(path).catch(e => false));
+if (await fileExists('./core')) {
+    await fs.cp("./core", `${process.env.VITE_APP_CORE_DIR}`, { recursive: true });
+}
 let error = null;
 try {
     const url = `${process.env.VITE_APP_PROTOCOL}://${process.env.VITE_APP_HOST}/api/package`
