@@ -1,4 +1,8 @@
 Changelog for Workload.
+1.0.5-beta
+==============
+- Прилипание и koef_time.
+
 1.0.0-beta
 ==============
 - init.
@@ -6,4 +10,3 @@ Changelog for Workload.
 - bgColorSmena.
 - Табличку внутри ячеек.
 - Прилипание столбца нарядов.
-- Прилипание и koef_time.
